@@ -1,0 +1,58 @@
+version: '3'
+
+services:
+#  db:
+#    image: mysql:8.0.30
+#    container_name: python-weather-app-db
+#    restart: always
+#    ports:
+#      - "127.0.0.1:3319:3306"
+#    environment:
+#      MYSQL_ROOT_PASSWORD: 123456
+#    volumes:
+#      - db-data:/var/lib/mysql
+#      - ./docker/my.cnf:/etc/mysql/my.cnf
+#      - ./docker/db:/docker-entrypoint-initdb.d
+#    networks:
+#      - default
+#    logging:
+#      driver: "json-file"
+#      options:
+#        max-size: "10M"
+#        max-file: "1000"
+
+  db:
+    image: postgres:15
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=hello_django
+      - POSTGRES_PASSWORD=hello_django
+      - POSTGRES_DB=hello_django_dev
+
+  app:
+    build:
+      context: ./app
+      dockerfile: ../Dockerfile
+    #image: python:3.12.3-alpine
+#    command: gunicorn hello_django.wsgi:application --bind 0.0.0.0:8000
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./app/:/usr/src/app
+    container_name: python-weather-app
+    ports:
+      - "8099:8000"
+    depends_on:
+      - db
+    env_file: .env.dev
+    environment:
+      DEBUG: 'true'
+
+volumes:
+  postgres_data:
+
+networks:
+  default:
+    driver: bridge

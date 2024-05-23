@@ -1,0 +1,8 @@
+*.env
+codeship.aes
+venv
+*.pyc
+staticfiles
+.env
+.idea
+app/env/
